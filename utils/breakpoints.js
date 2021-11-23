@@ -4,6 +4,7 @@ export const size = {
 	lg: 1024,
 	xl: 1280,
 	'2xl': 1536,
+	'3xl': 1680,
 };
 
 const breakpoints = {
@@ -12,6 +13,7 @@ const breakpoints = {
 	lg: `(min-width: ${size.lg}px)`,
 	xl: `(min-width: ${size.xl}px)`,
 	'2xl': `(min-width: ${size['2xl']}px)`,
+	'3xl': `(min-width: ${size['3xl']}px)`,
 };
 
 export default breakpoints;
