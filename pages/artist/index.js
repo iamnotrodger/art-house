@@ -1,11 +1,10 @@
 import Head from 'next/head';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import { getArtists } from '../../api/ArtistAPI';
 import ArtistList from '../../components/ArtistList';
-import InfiniteScrollStyled from '../../elements/InfiniteScrollStyled';
-import MaxWidthContainer from '../../elements/MaxWidthContainer';
 import Title from '../../elements/Title';
+import useIntersectionObserver from '../../hooks/useIntersectionObserver';
 import { parseError } from '../../utils/error';
 import Error from '../_error';
 
@@ -21,6 +20,8 @@ const ArtistExplorePage = ({ value, error }) => {
 		});
 	};
 
+	const endScrollRef = useRef();
+	const [errorState, setErrorState] = useState(error);
 	const { data, hasNextPage, fetchNextPage, ...query } = useInfiniteQuery(
 		'artists',
 		fetchArtists,
@@ -33,7 +34,6 @@ const ArtistExplorePage = ({ value, error }) => {
 			enabled: false,
 		}
 	);
-	const [errorState, setErrorState] = useState(error);
 
 	useEffect(() => {
 		if (query.error) {
@@ -41,23 +41,24 @@ const ArtistExplorePage = ({ value, error }) => {
 		}
 	}, [query.error]);
 
+	useIntersectionObserver({
+		target: endScrollRef,
+		onIntersect: fetchNextPage,
+		enabled: hasNextPage,
+	});
+
 	if (errorState) return <Error {...errorState} />;
+
 	const artists = data.pages.flat();
+
 	return (
 		<Fragment>
 			<Head>
 				<title>Explore Artists</title>
 			</Head>
-			<MaxWidthContainer>
-				<Title>Artists</Title>
-				<InfiniteScrollStyled
-					dataLength={artists.length}
-					next={fetchNextPage}
-					hasMore={hasNextPage}
-				>
-					<ArtistList items={artists} />
-				</InfiniteScrollStyled>
-			</MaxWidthContainer>
+			<Title>Artists</Title>
+			<ArtistList items={artists} />
+			<div ref={endScrollRef}></div>
 		</Fragment>
 	);
 };

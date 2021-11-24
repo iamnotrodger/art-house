@@ -1,11 +1,10 @@
 import Head from 'next/head';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import { getExhibitions } from '../../api/ExhibitionAPI';
 import ExhibitionList from '../../components/ExhibitionList';
-import InfiniteScrollStyled from '../../elements/InfiniteScrollStyled';
-import MaxWidthContainer from '../../elements/MaxWidthContainer';
 import Title from '../../elements/Title';
+import useIntersectionObserver from '../../hooks/useIntersectionObserver';
 import { parseError } from '../../utils/error';
 import Error from '../_error';
 
@@ -21,6 +20,8 @@ const ExhibitionExplorePage = ({ value, error }) => {
 		});
 	};
 
+	const endScrollRef = useRef();
+	const [errorState, setErrorState] = useState(error);
 	const { data, hasNextPage, fetchNextPage, ...query } = useInfiniteQuery(
 		'exhibitions',
 		fetchExhibition,
@@ -33,7 +34,6 @@ const ExhibitionExplorePage = ({ value, error }) => {
 			enabled: false,
 		}
 	);
-	const [errorState, setErrorState] = useState(error);
 
 	useEffect(() => {
 		if (query.error) {
@@ -41,23 +41,24 @@ const ExhibitionExplorePage = ({ value, error }) => {
 		}
 	}, [query.error]);
 
+	useIntersectionObserver({
+		target: endScrollRef,
+		onIntersect: fetchNextPage,
+		enabled: hasNextPage,
+	});
+
 	if (errorState) return <Error {...errorState} />;
+
 	const exhibitions = data.pages.flat();
+
 	return (
 		<Fragment>
 			<Head>
 				<title>Explore Exhibitions</title>
 			</Head>
-			<MaxWidthContainer>
-				<Title>Exhibitions</Title>
-				<InfiniteScrollStyled
-					dataLength={exhibitions.length}
-					next={fetchNextPage}
-					hasMore={hasNextPage}
-				>
-					<ExhibitionList items={exhibitions} />
-				</InfiniteScrollStyled>
-			</MaxWidthContainer>
+			<Title>Exhibitions</Title>
+			<ExhibitionList items={exhibitions} />
+			<div ref={endScrollRef}></div>
 		</Fragment>
 	);
 };
