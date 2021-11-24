@@ -4,6 +4,7 @@ import { useInfiniteQuery } from 'react-query';
 import { getArtists } from '../../api/ArtistAPI';
 import ArtistList from '../../components/ArtistList';
 import InfiniteScrollStyled from '../../elements/InfiniteScrollStyled';
+import MaxWidthContainer from '../../elements/MaxWidthContainer';
 import Title from '../../elements/Title';
 import { parseError } from '../../utils/error';
 import Error from '../_error';
@@ -47,14 +48,16 @@ const ArtistExplorePage = ({ value, error }) => {
 			<Head>
 				<title>Explore Artists</title>
 			</Head>
-			<Title>Artists</Title>
-			<InfiniteScrollStyled
-				dataLength={artists.length}
-				next={fetchNextPage}
-				hasMore={hasNextPage}
-			>
-				<ArtistList items={artists} />
-			</InfiniteScrollStyled>
+			<MaxWidthContainer>
+				<Title>Artists</Title>
+				<InfiniteScrollStyled
+					dataLength={artists.length}
+					next={fetchNextPage}
+					hasMore={hasNextPage}
+				>
+					<ArtistList items={artists} />
+				</InfiniteScrollStyled>
+			</MaxWidthContainer>
 		</Fragment>
 	);
 };
