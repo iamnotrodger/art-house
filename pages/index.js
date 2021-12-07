@@ -4,16 +4,17 @@ import { getArtworks } from '../api/ArtworkAPI';
 import ArtworkList from '../components/ArtworkList';
 import { parseError } from '../utils/error';
 import Error from './_error';
-import { useInfiniteQuery } from 'react-query';
+import { dehydrate, QueryClient, useInfiniteQuery } from 'react-query';
 
 let cursor = 0;
+const limit = process.env.NEXT_PUBLIC_ARTWORKS_LIMIT || 15;
 
-const HomePage = ({ value = [], error }) => {
+const HomePage = ({ error }) => {
 	const fetchArtworks = ({ pageParam = 0 }) => {
 		cursor += pageParam;
 		return getArtworks({
 			skip: cursor,
-			limit: process.env.NEXT_PUBLIC_ARTWORKS_LIMIT || 15,
+			limit,
 		});
 	};
 
@@ -25,7 +26,6 @@ const HomePage = ({ value = [], error }) => {
 				if (lastPage.length > 0) return lastPage.length;
 				return undefined;
 			},
-			initialData: { pages: [value] },
 			enabled: false,
 		}
 	);
@@ -55,11 +55,18 @@ export const getServerSideProps = async ({ req, res }) => {
 		'public, s-maxage=30, stale-while-revalidate=59'
 	);
 
+	const queryClient = new QueryClient();
+
 	try {
-		const artworks = await getArtworks({
-			limit: process.env.NEXT_PUBLIC_ARTWORKS_LIMIT || 15,
+		await queryClient.prefetchQuery('artworks', async () => {
+			const artworks = await getArtworks({
+				limit,
+			});
+			return {
+				pages: [artworks],
+			};
 		});
-		return { props: { value: artworks } };
+		return { props: { dehydratedState: dehydrate(queryClient) } };
 	} catch (error) {
 		return {
 			props: {
