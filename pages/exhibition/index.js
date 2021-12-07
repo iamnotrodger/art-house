@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { useInfiniteQuery } from 'react-query';
+import { dehydrate, QueryClient, useInfiniteQuery } from 'react-query';
 import { getExhibitions } from '../../api/ExhibitionAPI';
 import ExhibitionList from '../../components/ExhibitionList';
 import Title from '../../elements/Title';
@@ -9,37 +9,37 @@ import { parseError } from '../../utils/error';
 import Error from '../_error';
 
 let cursor = 0;
-const defaultExhibitionsLimit = 20;
+const limit = process.env.EXHIBITIONS_LIMIT || 15;
 
-const ExhibitionExplorePage = ({ value, error }) => {
+const ExhibitionExplorePage = ({ error }) => {
 	const fetchExhibition = ({ pageParam = 0 }) => {
 		cursor += pageParam;
 		return getExhibitions({
 			skip: cursor,
-			limit: process.env.EXHIBITIONS_LIMIT || defaultExhibitionsLimit,
+			limit,
 		});
 	};
 
 	const endScrollRef = useRef();
 	const [errorState, setErrorState] = useState(error);
-	const { data, hasNextPage, fetchNextPage, ...query } = useInfiniteQuery(
-		'exhibitions',
-		fetchExhibition,
-		{
-			getNextPageParam: (lastPage, pages) => {
-				if (lastPage.length > 0) return lastPage.length;
-				return undefined;
-			},
-			initialData: { pages: [value] },
-			enabled: false,
-		}
-	);
+	const {
+		data,
+		hasNextPage,
+		fetchNextPage,
+		error: queryError,
+	} = useInfiniteQuery('exhibitions', fetchExhibition, {
+		getNextPageParam: (lastPage, pages) => {
+			if (lastPage.length > 0) return lastPage.length;
+			return undefined;
+		},
+		enabled: false,
+	});
 
 	useEffect(() => {
-		if (query.error) {
-			setErrorState(query.error);
+		if (queryError) {
+			setErrorState(queryError);
 		}
-	}, [query.error]);
+	}, [queryError]);
 
 	useIntersectionObserver({
 		target: endScrollRef,
@@ -69,15 +69,16 @@ export const getServerSideProps = async ({ req, res }) => {
 		'public, s-maxage=60, stale-while-revalidate=59'
 	);
 
+	const queryClient = new QueryClient();
+
 	try {
-		const exhibitions = await getExhibitions({
-			limit: process.env.EXHIBITIONS_LIMIT || defaultExhibitionsLimit,
+		await queryClient.prefetchQuery('exhibitions', async () => {
+			const exhibitions = await getExhibitions({ limit });
+			return {
+				pages: [exhibitions],
+			};
 		});
-		return {
-			props: {
-				value: exhibitions,
-			},
-		};
+		return { props: { dehydratedState: dehydrate(queryClient) } };
 	} catch (error) {
 		return {
 			props: {
