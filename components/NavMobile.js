@@ -1,9 +1,15 @@
 import { useRouter } from 'next/router';
 import styled, { css } from 'styled-components';
 import NavLink from './NavLink';
+import SearchInput from './SearchInput';
+import SearchInputMobile from './SearchInputMobile';
 
 const NavMobile = ({ active, className }) => {
 	const router = useRouter();
+
+	if (router.pathname === '/search') {
+		return <SearchInputMobile />;
+	}
 
 	return (
 		<NavContainer active={active} className={className}>
