@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import styled, { css } from 'styled-components';
+import useSearch from '../contexts/SearchContext';
 import HomeIcon from '../icons/HomeIcon';
 import SearchIcon from '../icons/SearchIcon';
 import breakpoints from '../utils/breakpoints';
@@ -7,13 +8,18 @@ import NavLink from './NavLink';
 
 const TabBar = ({ active, className }) => {
 	const router = useRouter();
+	const { search } = useSearch();
+	const searchQuery = search ? `?q=${search}` : '';
 
 	return (
 		<Bar active={active} className={className}>
 			<NavLink to='/' active={'/' === router.pathname}>
 				<HomeIcon height='1' width='1' />
 			</NavLink>
-			<NavLink to='/search' active={'/search' === router.pathname}>
+			<NavLink
+				to={`/search${searchQuery}`}
+				active={'/search' === router.pathname}
+			>
 				<SearchIcon height='1' width='1' />
 			</NavLink>
 		</Bar>
