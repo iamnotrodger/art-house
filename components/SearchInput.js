@@ -57,7 +57,6 @@ const SearchForm = styled.form`
 	display: flex;
 	align-items: center;
 	width: 100%;
-	margin: 0 0.5rem;
 	color: var(--color-gray-500);
 `;
 

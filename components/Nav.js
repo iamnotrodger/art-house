@@ -39,7 +39,12 @@ const Nav = ({ className }) => {
 				<NavLink to='/artist' active={'/artist' === router.pathname}>
 					Artists
 				</NavLink>
-				<SearchInput setActive={setBlurActive} placeholder='Search' />
+				<SearchInputContainer>
+					<SearchInput
+						setActive={setBlurActive}
+						placeholder='Search'
+					/>
+				</SearchInputContainer>
 			</NavContainer>
 		</Fragment>
 	);
@@ -58,6 +63,11 @@ const NavContainer = styled.nav`
 		padding: 0.75rem;
 		padding: 1rem;
 	}
+`;
+
+const SearchInputContainer = styled.div`
+	margin: 0 0.5rem;
+	width: 100%;
 `;
 
 export default Nav;
