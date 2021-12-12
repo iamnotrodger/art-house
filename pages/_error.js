@@ -4,13 +4,13 @@ import ErrorContainer from '../elements/ErrorContainer';
 import ErrorDescription from '../elements/ErrorDescription';
 import ErrorTitle from '../elements/ErrorTitle';
 import Custom404 from './404';
-import Custom500 from './500';
 
-const Error = ({ statusCode, title, message }) => {
+const Error = ({
+	statusCode = 500,
+	message = 'Oh oh! Something went wrong.',
+}) => {
 	if (statusCode == 404) {
 		return <Custom404 />;
-	} else if (statusCode) {
-		return <Custom500 />;
 	}
 
 	return (
@@ -19,7 +19,7 @@ const Error = ({ statusCode, title, message }) => {
 				<title>Something went wrong</title>
 			</Head>
 			<ErrorContainer>
-				<ErrorTitle>{title}</ErrorTitle>
+				<ErrorTitle>{statusCode}</ErrorTitle>
 				<ErrorDescription>{message}</ErrorDescription>
 			</ErrorContainer>
 		</Fragment>
