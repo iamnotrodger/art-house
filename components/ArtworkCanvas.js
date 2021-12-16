@@ -2,13 +2,20 @@ import Link from 'next/link';
 import styled from 'styled-components';
 import ImageCover from '../elements/ImageCover';
 import breakpoints from '../utils/breakpoints';
+import { findImageWithSize, isImagePortrait } from '../utils/image';
 import ResponsiveImage from './ResponsiveImage';
 
 const artistImageSizes = `${breakpoints.lg} 48px, 32px`;
 
 const ArtworkCanvas = ({ value }) => {
 	const { title, year, description, images, artist } = value;
-	const isPortrait = images[0].width <= images[0].height * 1.5;
+	const imageWithSize = findImageWithSize(images);
+	let isPortrait = true;
+
+	if (imageWithSize) {
+		isPortrait = isImagePortrait(imageWithSize.width, imageWithSize.height);
+	}
+
 	const imageSizes = isPortrait ? '608px' : `${breakpoints.lg} 1024px, 608px`;
 
 	return (
