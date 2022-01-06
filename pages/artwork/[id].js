@@ -1,6 +1,6 @@
 import Head from 'next/head';
+import { Fragment } from 'react';
 import { dehydrate, QueryClient, useQuery } from 'react-query';
-import { Fragment } from 'react/cjs/react.production.min';
 import { getArtwork } from '../../api/ArtworkAPI';
 import ArtworkCanvas from '../../components/ArtworkCanvas';
 import { parseError } from '../../utils/error';
