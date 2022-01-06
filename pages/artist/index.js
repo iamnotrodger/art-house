@@ -5,17 +5,16 @@ import { getArtists } from '../../api/ArtistAPI';
 import ArtistList from '../../components/ArtistList';
 import Title from '../../elements/Title';
 import useIntersectionObserver from '../../hooks/useIntersectionObserver';
+import { getCursor } from '../../utils/cursor';
 import { parseError } from '../../utils/error';
 import Error from '../_error';
 
-let cursor = 0;
 const limit = process.env.NEXT_PUBLIC_ARTISTS_LIMIT || 20;
 
 const ArtistExplorePage = () => {
 	const fetchArtists = ({ pageParam = 0 }) => {
-		cursor += pageParam;
 		return getArtists({
-			skip: cursor,
+			skip: pageParam,
 			limit,
 		});
 	};
@@ -26,7 +25,7 @@ const ArtistExplorePage = () => {
 		fetchArtists,
 		{
 			getNextPageParam: (lastPage, pages) => {
-				if (lastPage.length > 0) return lastPage.length;
+				if (lastPage.length > 0) return getCursor(pages);
 				return undefined;
 			},
 			enabled: false,

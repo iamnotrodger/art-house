@@ -3,17 +3,16 @@ import { Fragment } from 'react';
 import { dehydrate, QueryClient, useInfiniteQuery } from 'react-query';
 import { getArtworks } from '../api/ArtworkAPI';
 import ArtworkList from '../components/ArtworkList';
+import { getCursor } from '../utils/cursor';
 import { parseError } from '../utils/error';
 import Error from './_error';
 
-let cursor = 0;
 const limit = process.env.NEXT_PUBLIC_ARTWORKS_LIMIT || 15;
 
 const HomePage = () => {
 	const fetchArtworks = ({ pageParam = 0 }) => {
-		cursor += pageParam;
 		return getArtworks({
-			skip: cursor,
+			skip: pageParam,
 			limit,
 		});
 	};
@@ -23,7 +22,7 @@ const HomePage = () => {
 		fetchArtworks,
 		{
 			getNextPageParam: (lastPage, pages) => {
-				if (lastPage.length > 0) return lastPage.length;
+				if (lastPage.length > 0) return getCursor(pages);
 				return undefined;
 			},
 			enabled: false,

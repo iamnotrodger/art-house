@@ -1,21 +1,20 @@
 import Head from 'next/head';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useRef } from 'react';
 import { dehydrate, QueryClient, useInfiniteQuery } from 'react-query';
 import { getExhibitions } from '../../api/ExhibitionAPI';
 import ExhibitionList from '../../components/ExhibitionList';
 import Title from '../../elements/Title';
 import useIntersectionObserver from '../../hooks/useIntersectionObserver';
+import { getCursor } from '../../utils/cursor';
 import { parseError } from '../../utils/error';
 import Error from '../_error';
 
-let cursor = 0;
 const limit = process.env.EXHIBITIONS_LIMIT || 15;
 
 const ExhibitionExplorePage = () => {
 	const fetchExhibition = ({ pageParam = 0 }) => {
-		cursor += pageParam;
 		return getExhibitions({
-			skip: cursor,
+			skip: pageParam,
 			limit,
 		});
 	};
@@ -26,7 +25,7 @@ const ExhibitionExplorePage = () => {
 		fetchExhibition,
 		{
 			getNextPageParam: (lastPage, pages) => {
-				if (lastPage.length > 0) return lastPage.length;
+				if (lastPage.length > 0) return getCursor(pages);
 				return undefined;
 			},
 			enabled: false,
