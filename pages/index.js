@@ -1,15 +1,15 @@
 import Head from 'next/head';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment } from 'react';
+import { dehydrate, QueryClient, useInfiniteQuery } from 'react-query';
 import { getArtworks } from '../api/ArtworkAPI';
 import ArtworkList from '../components/ArtworkList';
 import { parseError } from '../utils/error';
 import Error from './_error';
-import { dehydrate, QueryClient, useInfiniteQuery } from 'react-query';
 
 let cursor = 0;
 const limit = process.env.NEXT_PUBLIC_ARTWORKS_LIMIT || 15;
 
-const HomePage = ({ error }) => {
+const HomePage = () => {
 	const fetchArtworks = ({ pageParam = 0 }) => {
 		cursor += pageParam;
 		return getArtworks({
@@ -18,7 +18,7 @@ const HomePage = ({ error }) => {
 		});
 	};
 
-	const { data, fetchNextPage, ...query } = useInfiniteQuery(
+	const { data, error, fetchNextPage } = useInfiniteQuery(
 		'artworks',
 		fetchArtworks,
 		{
@@ -27,17 +27,11 @@ const HomePage = ({ error }) => {
 				return undefined;
 			},
 			enabled: false,
+			staleTime: 60 * 1000,
 		}
 	);
-	const [errorState, setErrorState] = useState(error);
 
-	useEffect(() => {
-		if (query.error) {
-			setErrorState(query.error);
-		}
-	}, [query.error]);
-
-	if (errorState) return <Error {...errorState} />;
+	if (error) return <Error {...parseError(error)} />;
 	return (
 		<Fragment>
 			<Head>
@@ -49,31 +43,18 @@ const HomePage = ({ error }) => {
 	);
 };
 
-export const getServerSideProps = async ({ req, res }) => {
-	res.setHeader(
-		'Cache-Control',
-		'public, s-maxage=30, stale-while-revalidate=59'
-	);
-
+export const getServerSideProps = async () => {
 	const queryClient = new QueryClient();
 
-	try {
-		await queryClient.prefetchQuery('artworks', async () => {
-			const artworks = await getArtworks({
-				limit,
-			});
-			return {
-				pages: [artworks],
-			};
+	await queryClient.prefetchQuery('artworks', async () => {
+		const artworks = await getArtworks({
+			limit,
 		});
-		return { props: { dehydratedState: dehydrate(queryClient) } };
-	} catch (error) {
 		return {
-			props: {
-				error: parseError(error),
-			},
+			pages: [artworks],
 		};
-	}
+	});
+	return { props: { dehydratedState: dehydrate(queryClient) } };
 };
 
 export default HomePage;
