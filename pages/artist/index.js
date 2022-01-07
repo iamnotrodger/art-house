@@ -3,7 +3,7 @@ import { Fragment, useRef } from 'react';
 import { dehydrate, QueryClient, useInfiniteQuery } from 'react-query';
 import { getArtists } from '../../api/ArtistAPI';
 import ArtistList from '../../components/ArtistList';
-import Title from '../../elements/Title';
+import Header from '../../elements/Header';
 import useIntersectionObserver from '../../hooks/useIntersectionObserver';
 import { getCursor } from '../../utils/cursor';
 import { parseError } from '../../utils/error';
@@ -45,7 +45,7 @@ const ArtistExplorePage = () => {
 			<Head>
 				<title>Explore Artists</title>
 			</Head>
-			<Title>Artists</Title>
+			<Header>Artists</Header>
 			<ArtistList items={data.pages.flat()} />
 			<div ref={endScrollRef}></div>
 		</Fragment>

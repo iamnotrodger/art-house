@@ -3,7 +3,7 @@ import { Fragment, useRef } from 'react';
 import { dehydrate, QueryClient, useInfiniteQuery } from 'react-query';
 import { getExhibitions } from '../../api/ExhibitionAPI';
 import ExhibitionList from '../../components/ExhibitionList';
-import Title from '../../elements/Title';
+import Header from '../../elements/Header';
 import useIntersectionObserver from '../../hooks/useIntersectionObserver';
 import { getCursor } from '../../utils/cursor';
 import { parseError } from '../../utils/error';
@@ -45,7 +45,7 @@ const ExhibitionExplorePage = () => {
 			<Head>
 				<title>Explore Exhibitions</title>
 			</Head>
-			<Title>Exhibitions</Title>
+			<Header>Exhibitions</Header>
 			<ExhibitionList items={data.pages.flat()} />
 			<div ref={endScrollRef}></div>
 		</Fragment>
