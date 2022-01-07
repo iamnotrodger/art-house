@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import ImageCover from '../elements/ImageCover';
+import Subtitle from '../elements/Subtitle';
+import Title from '../elements/Title';
 import breakpoints from '../utils/breakpoints';
 
 const defaultImageSizes = `${breakpoints.lg} 192px, 122px`;
@@ -14,8 +16,8 @@ const ArtistHeader = ({ value = {}, imageSizes = defaultImageSizes }) => {
 				<ImageCover images={images} sizes={imageSizes} alt='artist' />
 			</ImageContainer>
 			<Info>
-				<Name>{name}</Name>
-				<Title>Artist</Title>
+				<Title>{name}</Title>
+				<Subtitle>Artist</Subtitle>
 			</Info>
 		</Container>
 	);
@@ -25,12 +27,12 @@ const Container = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding-bottom: 1rem;
+	margin-bottom: 1rem;
 	gap: 0.5rem;
 
 	@media ${breakpoints.md} {
 		flex-direction: row;
-		padding-bottom: 2rem;
+		margin-bottom: 2rem;
 		gap: 2rem;
 	}
 `;
@@ -53,23 +55,6 @@ const Info = styled.div`
 	@media ${breakpoints.md} {
 		max-width: 65%;
 		align-items: flex-start;
-	}
-`;
-const Name = styled.h1`
-	font-size: var(--text-2xl);
-	font-weight: var(--font-bold);
-	line-height: 1.1;
-
-	@media ${breakpoints.md} {
-		font-size: var(--text-6xl);
-	}
-`;
-const Title = styled.div`
-	font-family: var(--font-secondary);
-	font-size: var(--text-base);
-
-	@media ${breakpoints.md} {
-		font-size: var(--text-xl);
 	}
 `;
 
