@@ -35,15 +35,18 @@ const ArtistLink = styled.a`
 	align-items: center;
 	flex-direction: column;
 	height: 100%;
-	padding: 2rem;
-	background-color: var(--color-light);
 	border-radius: var(--rounded-xl);
-	box-shadow: var(--shadow);
 	transition: var(--transition);
 	transition-property: background-color;
 
 	&:hover {
 		background-color: var(--color-gray-100);
+	}
+
+	@media ${breakpoints.md} {
+		padding: 2rem;
+		background-color: var(--color-light);
+		box-shadow: var(--shadow);
 	}
 `;
 
@@ -60,8 +63,14 @@ const ImageContainer = styled.div`
 `;
 
 const Info = styled.div`
-	margin-top: 1.5rem;
-	align-self: flex-start;
+	margin-top: 0.5rem;
+	text-align: center;
+
+	@media ${breakpoints.md} {
+		margin-top: 1.5rem;
+		text-align: start;
+		align-self: flex-start;
+	}
 `;
 
 const Name = styled.div`
