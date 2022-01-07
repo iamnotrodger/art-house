@@ -10,6 +10,7 @@ import { getArtist, getArtistArtworks } from '../../api/ArtistAPI';
 import ArtistHeader from '../../components/ArtistHeader';
 import ArtworkList from '../../components/ArtworkList';
 import { getCursor } from '../../utils/cursor';
+import { parseError } from '../../utils/error';
 import { getSmallestImage } from '../../utils/image';
 import Error from '../_error';
 
